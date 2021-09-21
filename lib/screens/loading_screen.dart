@@ -1,10 +1,12 @@
-import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-import '/utils/constants.dart';
+import '/services/networking.dart';
+import '/utils/api_keys.dart';
 import '/services/location.dart';
+import 'location_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -20,32 +22,47 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getLocationData();
   }
 
-  void getLocation() async {
+  void getLocationData() async {
     Location location = Location();
     await location.getCurrentLocation();
     latitude = location.lattitude;
     longitude = location.longitude;
 
-    getData();
-  }
+    NetworkHelper networkHelper = NetworkHelper(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$kAPIKey&units=metric');
 
-  void getData() async {
-    http.Response response = await http.get(Uri.parse(
-        'api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$kAPIKey'));
+    var weatherData = await networkHelper.getData();
 
-    if (response.statusCode == 200) {
-      String data = response.body;
-      var decodedData = jsonDecode(data);
-    } else {
-      print(response.statusCode);
-    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return LocationScreen(weatherData);
+    }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            SpinKitChasingDots(
+              color: Colors.white,
+            ),
+            Text(
+              '\nGetting data...\n\nPlease make sure you have an active internet connection',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                height: 1.4,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
