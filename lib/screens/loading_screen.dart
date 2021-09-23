@@ -40,7 +40,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
               color: Colors.white,
             ),
             Text(
-              '\nGetting data...\n\nPlease make sure you have an active internet connection',
+              '\nGetting data...\n\nPlease make sure you have an active internet connection and location enabled',
               textAlign: TextAlign.center,
               style: TextStyle(
                 height: 1.4,

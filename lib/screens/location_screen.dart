@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'city_screen.dart';
 import '/utils/constants.dart';
 import '/services/weather.dart';
 
@@ -18,8 +19,8 @@ class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weather = WeatherModel();
   int temperature = 0;
   String weatherIcon = 'NA';
-  String? cityName;
-  String? message;
+  String cityName = 'NA';
+  String message = 'Something went wrong :(';
 
   @override
   void initState() {
@@ -29,6 +30,9 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void updateUI(dynamic weatherData) {
     setState(() {
+      if (weatherData == null) {
+        return;
+      }
       double temp = weatherData['main']['temp'];
       temperature = temp.round();
       var condition = weatherData['weather'][0]['id'];
@@ -69,9 +73,19 @@ class _LocationScreenState extends State<LocationScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        var typedCity = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return CityScreen();
+                            },
+                          ),
+                        );
+                      },
                       child: const Icon(
                         Icons.location_city_rounded,
+                        color: Colors.white,
                       ),
                     ),
                   ],
